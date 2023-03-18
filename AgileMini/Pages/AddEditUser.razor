@@ -1,0 +1,57 @@
+﻿@page "/AddEditUser/{Id:int?}"
+@using AgileMini.Data
+@inject DataService DataService
+
+<h3>@getHeader()</h3>
+
+<EditForm Model="@user" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <p>
+        <label>
+            ФИО:
+            <InputText @bind-Value="user.Name"/>
+        </label>
+    </p>
+    <p>
+        <label>
+            Email:
+            <InputText @bind-Value="user.Email"/>
+        </label>
+    </p>
+
+    <button type="submit">Сохранить</button>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int? userId { get; set; }
+
+    private User? user;
+    bool newModel;
+
+    private string getHeader()
+    {
+        return newModel ? "Добавление пользователя" : "Изменение пользователя";
+    }
+
+    protected override void OnInitialized()
+    {
+        if (userId != null)
+            user = DataService.GetUser(userId.Value);
+        newModel = userId != null;
+        user ??= new User();
+        base.OnInitialized();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (newModel)
+            await DataService.AddUser(user);
+        else
+            await DataService.EditUser(user);
+    }
+
+}

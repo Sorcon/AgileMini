@@ -1,0 +1,44 @@
+﻿@page "/tasks"
+
+@using AgileMini.Data
+@inject DataService DataService
+
+<h1>Задачи</h1>
+
+@if (tasks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Краткое описание</th>
+                <th>Состояние</th>
+                <th>Пользователь</th>
+                <th>Проект</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in tasks)
+            {
+                <tr>
+                    <td>@task.Summary</td>
+                    <td>@task.State</td>
+                    <td>@task.User?.Name</td>
+                    <td>@task.Project.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private TaskVM[]? tasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await DataService.GetTasks();
+    }
+}
